@@ -1,0 +1,912 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mortgage Calculator</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * { margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+        }
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; 
+            background: linear-gradient(135deg, #66c7ea 0%, #7bf0b9 100%); 
+            min-height: 100vh; padding: 20px; 
+        }
+        .container { 
+            max-width: 1400px; 
+            margin: 0 auto; 
+        }
+        header { 
+            text-align: center; 
+            color: white; 
+            margin-bottom: 30px; 
+        }
+        h1 { 
+            font-size: 2.5em; 
+            margin-bottom: 10px; 
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2); 
+        }
+        .subtitle { 
+            font-size: 1.1em; 
+            opacity: 0.95; 
+        }
+        .ad-space { 
+            background: rgba(255,255,255,0.1); 
+            border: 2px dashed rgba(255,255,255,0.3); 
+            border-radius: 8px; 
+            padding: 20px; 
+            text-align: center; 
+            color: white; 
+            margin: 20px 0; 
+            min-height: 100px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 0.9em; 
+        }
+        .ad-space.horizontal { 
+            min-height: 90px; 
+        }
+        .ad-space.vertical { 
+            min-height: 250px; 
+        }
+        .main-content { 
+            display: grid; 
+            grid-template-columns: 1fr 300px; 
+            gap: 20px; 
+            margin-bottom: 20px; 
+        }
+        .calculator-section { 
+            background: white; 
+            border-radius: 15px; 
+            padding: 30px; 
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1); 
+        }
+        .tabs { 
+            display: flex; 
+            gap: 10px; 
+            margin-bottom: 30px; 
+            flex-wrap: wrap; 
+        }
+        .tab { 
+            padding: 12px 24px; 
+            background: #f0f0f0; 
+            border: none; 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-size: 0.95em; 
+            font-weight: 600; 
+            transition: all 0.3s; 
+            color: #555; 
+        }
+        .tab.active { 
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+            color: white; 
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4); 
+        }
+        .tab:hover { 
+            transform: translateY(-2px); 
+        }
+        .calculator-content { 
+            display: none; 
+        }
+        .calculator-content.active { 
+            display: block; 
+        }
+        .input-group { 
+            margin-bottom: 25px; 
+        }
+        label { 
+            display: block; 
+            margin-bottom: 8px; 
+            font-weight: 600; 
+            color: #555; 
+            font-size: 0.95em; 
+        }
+        input, select { 
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 2px solid #e0e0e0; 
+            border-radius: 8px; 
+            font-size: 1em; 
+            transition: border-color 0.3s; 
+        }
+        input:focus, select:focus { 
+            outline: none; 
+            border-color: #667eea; 
+        }
+        .input-with-prefix { 
+            position: relative; 
+        }
+        .input-prefix { 
+            position: absolute; 
+            left: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: #999; font-weight: 600; 
+        }
+        .input-with-prefix input { 
+            padding-left: 35px; 
+        }
+        .input-suffix { 
+            position: absolute; 
+            right: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            color: #999; 
+            font-weight: 600; 
+        }
+        .calculate-btn { 
+            width: 100%; 
+            padding: 15px; 
+            background: linear-gradient(135deg, #667cea 0%, #7bf0b9 100%); 
+            color: white; 
+            border: none; 
+            border-radius: 8px; 
+            font-size: 1.1em; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: transform 0.3s; 
+            margin-top: 10px; 
+        }
+        .calculate-btn:hover { 
+            transform: translateY(-2px); 
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4); 
+        }
+        .results { 
+            margin-top: 30px; 
+            padding: 25px; 
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%); 
+            border-radius: 12px; 
+            display: none;
+        }
+        .results.show { 
+            display: block; 
+        }
+        .result-item { 
+            display: flex; 
+            justify-content: space-between; 
+            padding: 15px 0; 
+            border-bottom: 1px solid rgba(0,0,0,0.1); 
+        }
+        .result-item:last-child { 
+            border-bottom: none; 
+        }
+        .result-label { 
+            font-weight: 600; 
+            color: #555; 
+        }
+        .result-value { 
+            font-size: 1.3em; 
+            font-weight: 700; 
+            color: #667eea; 
+        }
+        .result-value.large { 
+            font-size: 1.8em; 
+        }
+        .chart-container { 
+            margin-top: 30px; 
+            background: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+        }
+        .two-column { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 20px; 
+        }
+        .comparison-card { 
+            background: white; 
+            padding: 20px; 
+            border-radius: 8px; 
+            border: 2px solid #e0e0e0; 
+        }
+        .comparison-card h3 { 
+            color: #667eea; 
+            margin-bottom: 15px; 
+        }
+        .info-box { 
+            background: #e3f2fd; 
+            padding: 15px; 
+            border-radius: 8px; 
+            margin-top: 20px; 
+            border-left: 4px solid #2196f3; 
+        }
+        .info-box h4 { 
+            color: #1976d2; 
+            margin-bottom: 8px; 
+        }
+        .info-box p { 
+            color: #555; 
+            line-height: 1.6; 
+        }
+        .sidebar { 
+            display: flex; 
+            flex-direction: column; 
+            gap: 20px; 
+        }
+        @media (max-width: 1024px) { 
+            .main-content { 
+                grid-template-columns: 1fr; 
+            } .two-column { 
+                grid-template-columns: 1fr; 
+            } 
+        }
+        @media (max-width: 768px) { 
+            h1 { 
+                font-size: 1.8em; 
+            } 
+            .tab { 
+                padding: 10px 16px; 
+                font-size: 0.85em; 
+            } 
+            .calculator-section { 
+                padding: 20px; 
+            } 
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏠 Mortgage Calculator</h1>
+            <p class="subtitle">Calculate your monthly payment and compare loan options</p>
+        </header>
+        <div class="ad-space horizontal">Google AdSense - Horizontal Banner (728x90 or 970x90)</div>
+        <div class="main-content">
+            <div class="calculator-section">
+                <div class="tabs">
+                    <button class="tab active" onclick="switchTab('payment')">Monthly Payment</button>
+                    <button class="tab" onclick="switchTab('affordability')">Affordability</button>
+                    <button class="tab" onclick="switchTab('refinance')">Refinance</button>
+                    <button class="tab" onclick="switchTab('extra')">Extra Payments</button>
+                    <button class="tab" onclick="switchTab('comparison')">Compare Loans</button>
+                </div>
+                <div id="payment" class="calculator-content active">
+                    <h2 style="margin-bottom: 20px; color: #667eea;">Monthly Payment Calculator</h2>
+                    <div class="input-group">
+                        <label>Home Price</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="homePrice" value="300000" step="1000">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Down Payment</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="downPayment" value="60000" step="1000">
+                            <span class="input-suffix">(<span id="downPercent">20</span>%)</span>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Interest Rate (%)</label>
+                        <input type="number" id="interestRate" value="6.5" step="0.125">
+                    </div>
+                    <div class="input-group">
+                        <label>Loan Term</label>
+                        <select id="loanTerm">
+                            <option value="15">15 years</option>
+                            <option value="20">20 years</option>
+                            <option value="30" selected>30 years</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Property Tax (yearly)</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="propertyTax" value="3600" step="100">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Home Insurance (yearly)</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="homeInsurance" value="1200" step="100">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>HOA Fees (monthly)</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="hoaFees" value="0" step="10">
+                        </div>
+                    </div>
+                    <button class="calculate-btn" onclick="calculatePayment()">Calculate Payment</button>
+                    <div id="paymentResults" class="results">
+                        <div class="result-item">
+                            <span class="result-label">Monthly Payment (P&I)</span>
+                            <span class="result-value" id="piPayment">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Property Tax</span>
+                            <span class="result-value" id="taxPayment">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Insurance</span>
+                            <span class="result-value" id="insurancePayment">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">HOA Fees</span>
+                            <span class="result-value" id="hoaPayment">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">PMI</span>
+                            <span class="result-value" id="pmiPayment">$0</span>
+                        </div>
+                        <div class="result-item" style="background: white; margin-top: 10px; border-radius: 8px; padding: 15px;"><span class="result-label" style="font-size: 1.2em;">Total Monthly Payment</span><span class="result-value large" id="totalPayment">$0</span></div>
+                    </div>
+                    <div class="chart-container" id="pieChartContainer" style="display:none;">
+                        <h3 style="margin-bottom: 15px; color: #667eea;">Payment Breakdown</h3>
+                        <canvas id="pieChart"></canvas>
+                    </div>
+                </div>
+                <div id="affordability" class="calculator-content">
+                    <h2 style="margin-bottom: 20px; color: #667eea;">How Much House Can I Afford?</h2>
+                    <div class="input-group">
+                        <label>Annual Income</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="annualIncome" value="80000" step="1000">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Monthly Debts</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="monthlyDebts" value="500" step="50">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Down Payment Saved</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="downPaymentSaved" value="60000" step="1000">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Interest Rate (%)</label>
+                        <input type="number" id="affordInterestRate" value="6.5" step="0.125">
+                    </div>
+                    <div class="input-group">
+                        <label>Loan Term</label>
+                        <select id="affordLoanTerm">
+                            <option value="15">15 years</option>
+                            <option value="20">20 years</option>
+                            <option value="30" selected>30 years</option>
+                        </select>
+                    </div>
+                    <button class="calculate-btn" onclick="calculateAffordability()">Calculate Affordability</button>
+                    <div id="affordResults" class="results">
+                        <div class="result-item" style="background: white; border-radius: 8px; padding: 15px;">
+                            <span class="result-label" style="font-size: 1.2em;">You Can Afford</span>
+                            <span class="result-value large" id="affordableAmount">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Monthly Payment</span>
+                            <span class="result-value" id="affordMonthly">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Down Payment</span>
+                            <span class="result-value" id="affordDown">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Loan Amount</span>
+                            <span class="result-value" id="affordLoan">$0</span>
+                        </div>
+                    </div>
+                    <div class="info-box"><h4>💡 How We Calculate</h4><p>Lenders use the 28/36 rule: housing ≤ 28% of income, total debt ≤ 36%.</p></div>
+                </div>
+                <div id="refinance" class="calculator-content">
+                    <h2 style="margin-bottom: 20px; color: #667eea;">Refinance Calculator</h2>
+                    <div class="input-group">
+                        <label>Current Loan Balance</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="currentBalance" value="240000" step="1000">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Current Rate (%)</label>
+                        <input type="number" id="currentRate" value="7.5" step="0.125">
+                    </div>
+                    <div class="input-group">
+                        <label>Years Remaining</label>
+                        <input type="number" id="yearsRemaining" value="27" step="1">
+                    </div>
+                    <div class="input-group">
+                        <label>New Rate (%)</label>
+                        <input type="number" id="newRate" value="6.0" step="0.125">
+                    </div>
+                    <div class="input-group">
+                        <label>New Term</label>
+                        <select id="newLoanTerm">
+                            <option value="15">15 years</option>
+                            <option value="20">20 years</option>
+                            <option value="30" selected>30 years</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Closing Costs</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="closingCosts" value="5000" step="100">
+                        </div>
+                    </div>
+                    <button class="calculate-btn" onclick="calculateRefinance()">Calculate Refinance</button>
+                    <div id="refinanceResults" class="results">
+                        <div class="result-item">
+                            <span class="result-label">Current Payment</span>
+                            <span class="result-value" id="refCurrentPayment">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">New Payment</span>
+                            <span class="result-value" id="refNewPayment">$0</span>
+                        </div>
+                        <div class="result-item" style="background: #e8f5e9; border-radius: 8px; padding: 15px;">
+                            <span class="result-label" style="font-size: 1.1em;">Monthly Savings</span>
+                            <span class="result-value" style="color: #4caf50;" id="refSavings">$0</span>
+                        </div>
+                        <div class="result-item">
+                            <span class="result-label">Break-Even</span>
+                            <span class="result-value" id="refBreakEven">0 months</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="extra" class="calculator-content">
+                    <h2 style="margin-bottom: 20px; color: #667eea;">Extra Payment Calculator</h2>
+                    <div class="input-group">
+                        <label>Loan Amount</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="extraLoanAmount" value="240000" step="1000">
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label>Interest Rate (%)</label>
+                        <input type="number" id="extraRate" value="6.5" step="0.125">
+                    </div>
+                    <div class="input-group">
+                        <label>Loan Term</label>
+                        <select id="extraLoanTerm">
+                            <option value="15">15 years</option>
+                            <option value="20">20 years</option>
+                            <option value="30" selected>30 years</option>
+                        </select>
+                    </div>
+                    <div class="input-group">
+                        <label>Extra Monthly Payment</label>
+                        <div class="input-with-prefix">
+                            <span class="input-prefix">$</span>
+                            <input type="number" id="extraMonthly" value="200" step="50">
+                        </div>
+                    </div>
+                    <button class="calculate-btn" onclick="calculateExtra()">Calculate Savings</button>
+                    <div id="extraResults" class="results">
+                        <div class="two-column">
+                            <div>
+                                <h3 style="color: #667eea; margin-bottom: 15px;">Without Extra</h3>
+                                <div class="result-item">
+                                    <span class="result-label">Payoff</span>
+                                    <span class="result-value" id="extraOrigTime">0</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Interest</span>
+                                    <span class="result-value" id="extraOrigInterest">$0</span>
+                                </div>
+                            </div>
+                            <div>
+                                <h3 style="color: #4caf50; margin-bottom: 15px;">With Extra</h3>
+                                <div class="result-item">
+                                    <span class="result-label">Payoff</span>
+                                    <span class="result-value" style="color: #4caf50;" id="extraNewTime">0</span>
+                                </div>
+                                <div class="result-item">
+                                    <span class="result-label">Interest</span>
+                                    <span class="result-value" style="color: #4caf50;" id="extraNewInterest">$0</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="result-item" style="background: #e8f5e9; border-radius: 8px; padding: 15px; margin-top: 15px;">
+                            <span class="result-label">Time Saved</span>
+                            <span class="result-value" style="color: #4caf50;" id="extraTimeSaved">0</span>
+                        </div>
+                        <div class="result-item" style="background: #e8f5e9; border-radius: 8px; padding: 15px;">
+                            <span class="result-label">Interest Saved</span>
+                            <span class="result-value large" style="color: #4caf50;" id="extraMoneySaved">$0</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Replace the comparison calculator section with this -->
+<div id="comparison" class="calculator-content">
+    <h2 style="margin-bottom: 20px; color: #667eea;">Compare Loan Options</h2>
+    
+    <div class="input-group">
+        <label>Loan Amount</label>
+        <div class="input-with-prefix">
+            <span class="input-prefix">$</span>
+            <input type="number" id="compLoanAmount" value="240000" step="1000">
+        </div>
+    </div>
+
+    <h3 style="color: #667eea; margin: 25px 0 15px 0; font-size: 1.1em;">Loan Option 1</h3>
+    <div class="input-group">
+        <label>Interest Rate (%)</label>
+        <input type="number" id="comp1Rate" value="6.0" step="0.125">
+    </div>
+    <div class="input-group">
+        <label>Loan Term (years)</label>
+        <input type="number" id="comp1Years" value="15" step="1" min="1" max="40">
+    </div>
+
+    <h3 style="color: #764ba2; margin: 25px 0 15px 0; font-size: 1.1em;">Loan Option 2</h3>
+    <div class="input-group">
+        <label>Interest Rate (%)</label>
+        <input type="number" id="comp2Rate" value="6.5" step="0.125">
+    </div>
+    <div class="input-group">
+        <label>Loan Term (years)</label>
+        <input type="number" id="comp2Years" value="30" step="1" min="1" max="40">
+    </div>
+
+    <button class="calculate-btn" onclick="calculateComparison()">Compare Options</button>
+
+    <div id="comparisonResults" class="results">
+        <div class="two-column">
+            <div class="comparison-card">
+                <h3>Option 1</h3>
+                <div class="result-item">
+                    <span class="result-label">Interest Rate</span>
+                    <span class="result-value" id="comp1RateDisplay">0%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Term</span>
+                    <span class="result-value" id="comp1TermDisplay">0 years</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Monthly Payment</span>
+                    <span class="result-value" id="comp1Monthly">$0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Interest</span>
+                    <span class="result-value" id="comp1Interest">$0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Paid</span>
+                    <span class="result-value" id="comp1Total">$0</span>
+                </div>
+            </div>
+            <div class="comparison-card">
+                <h3>Option 2</h3>
+                <div class="result-item">
+                    <span class="result-label">Interest Rate</span>
+                    <span class="result-value" id="comp2RateDisplay">0%</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Term</span>
+                    <span class="result-value" id="comp2TermDisplay">0 years</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Monthly Payment</span>
+                    <span class="result-value" id="comp2Monthly">$0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Interest</span>
+                    <span class="result-value" id="comp2Interest">$0</span>
+                </div>
+                <div class="result-item">
+                    <span class="result-label">Total Paid</span>
+                    <span class="result-value" id="comp2Total">$0</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="result-item" style="background: #e8f5e9; border-radius: 8px; padding: 15px; margin-top: 15px;">
+            <span class="result-label" style="font-size: 1.1em;">Difference in Monthly Payment</span>
+            <span class="result-value" style="color: #4caf50;" id="compMonthlyDiff">$0</span>
+        </div>
+        <div class="result-item" style="background: #e8f5e9; border-radius: 8px; padding: 15px;">
+            <span class="result-label" style="font-size: 1.1em;">Difference in Total Interest</span>
+            <span class="result-value" style="color: #4caf50;" id="compInterestDiff">$0</span>
+        </div>
+    </div>
+
+    <div class="chart-container" id="compChartContainer" style="display:none;">
+        <h3 style="margin-bottom: 15px; color: #667eea;">Total Cost Comparison</h3>
+        <canvas id="compChart"></canvas>
+    </div>
+
+    <div class="chart-container" id="compLineChartContainer" style="display:none;">
+        <h3 style="margin-bottom: 15px; color: #667eea;">Loan Balance Over Time</h3>
+        <canvas id="compLineChart"></canvas>
+    </div>
+</div>
+            </div>
+            <div class="sidebar">
+                <div class="ad-space vertical">Google AdSense<br>Vertical Ad<br>(300x600)</div>
+                <div class="ad-space vertical">Google AdSense<br>Vertical Ad<br>(300x250)</div>
+            </div>
+        </div>
+        <div class="ad-space horizontal">Google AdSense - Bottom Banner (728x90 or 970x90)</div>
+    </div>
+    <script>
+        let pc=null;
+        function switchTab(t){
+            document.querySelectorAll('.tab').forEach(e=>e.classList.remove('active'));
+            document.querySelectorAll('.calculator-content').forEach(e=>e.classList.remove('active'));
+            const a=['payment','affordability','refinance','extra','comparison'],i=a.indexOf(t);
+            if(i!==-1)document.querySelectorAll('.tab')[i].classList.add('active');
+            document.getElementById(t).classList.add('active')
+        }
+        document.getElementById('downPayment').addEventListener('input',function(){
+            const h=parseFloat(document.getElementById('homePrice').value)||0,d=parseFloat(this.value)||0,p=h>0?((d/h)*100).toFixed(1):0;
+            document.getElementById('downPercent').textContent=p
+        });
+        document.getElementById('homePrice').addEventListener('input',function(){
+            const h=parseFloat(this.value)||0,d=parseFloat(document.getElementById('downPayment').value)||0,p=h>0?((d/h)*100).toFixed(1):0;
+            document.getElementById('downPercent').textContent=p
+        });
+        function fmt(a){
+            return'$'+a.toLocaleString('en-US',{
+                minimumFractionDigits:0,maximumFractionDigits:0
+            })
+        }
+        function calcMP(p,r,y){
+            const mr=r/100/12,n=y*12;
+            return p*(mr*Math.pow(1+mr,n))/(Math.pow(1+mr,n)-1)
+        }
+        function calculatePayment(){
+            const hp=parseFloat(document.getElementById('homePrice').value)||0,dp=parseFloat(document.getElementById('downPayment').value)||0,ir=parseFloat(document.getElementById('interestRate').value)||0,lt=parseInt(document.getElementById('loanTerm').value)||30,pt=parseFloat(document.getElementById('propertyTax').value)||0,hi=parseFloat(document.getElementById('homeInsurance').value)||0,hf=parseFloat(document.getElementById('hoaFees').value)||0;const la=hp-dp,mpi=calcMP(la,ir,lt),mt=pt/12,mi=hi/12;
+            let pmi=0;
+            if((dp/hp)*100<20)pmi=la*0.005/12;
+            const tm=mpi+mt+mi+hf+pmi;
+            document.getElementById('piPayment').textContent=fmt(mpi);
+            document.getElementById('taxPayment').textContent=fmt(mt);
+            document.getElementById('insurancePayment').textContent=fmt(mi);
+            document.getElementById('hoaPayment').textContent=fmt(hf);
+            document.getElementById('pmiPayment').textContent=pmi>0?fmt(pmi):'$0';
+            document.getElementById('totalPayment').textContent=fmt(tm);
+            document.getElementById('paymentResults').classList.add('show');
+            if(pc)pc.destroy();
+            const ctx=document.getElementById('pieChart').getContext('2d');
+            pc=new Chart(ctx,{
+                type:'pie',data:{
+                labels:['Principal & Interest','Property Tax','Insurance','HOA','PMI'],datasets:[{
+                    data:[mpi,mt,mi,hf,pmi],backgroundColor:['#667eea','#764ba2','#f093fb','#4facfe','#43e97b']
+                }]
+            },options:{
+                responsive:true,plugins:{
+                    legend:{
+                        position:'bottom'
+                    }
+                }
+            }
+        });
+        document.getElementById('pieChartContainer').style.display='block'
+    }
+        function calculateAffordability(){
+            const ai=parseFloat(document.getElementById('annualIncome').value)||0,md=parseFloat(document.getElementById('monthlyDebts').value)||0,dps=parseFloat(document.getElementById('downPaymentSaved').value)||0,ir=parseFloat(document.getElementById('affordInterestRate').value)||0,lt=parseInt(document.getElementById('affordLoanTerm').value)||30;
+            const mi=ai/12,max1=mi*0.28,max2=(mi*0.36)-md,maxP=Math.min(max1,max2);
+            const mr=ir/100/12,n=lt*12,la=maxP*(Math.pow(1+mr,n)-1)/(mr*Math.pow(1+mr,n)),hp=la+dps;
+            document.getElementById('affordableAmount').textContent=fmt(hp);
+            document.getElementById('affordMonthly').textContent=fmt(maxP);
+            document.getElementById('affordDown').textContent=fmt(dps);
+            document.getElementById('affordLoan').textContent=fmt(la);
+            document.getElementById('affordResults').classList.add('show')
+        }
+        function calculateRefinance(){
+            const cb=parseFloat(document.getElementById('currentBalance').value)||0,cr=parseFloat(document.getElementById('currentRate').value)||0,yr=parseFloat(document.getElementById('yearsRemaining').value)||0,nr=parseFloat(document.getElementById('newRate').value)||0,nlt=parseInt(document.getElementById('newLoanTerm').value)||30,cc=parseFloat(document.getElementById('closingCosts').value)||0;
+            const cp=calcMP(cb,cr,yr),np=calcMP(cb,nr,nlt),ms=cp-np,be=ms>0?Math.ceil(cc/ms):0;
+            document.getElementById('refCurrentPayment').textContent=fmt(cp);
+            document.getElementById('refNewPayment').textContent=fmt(np);
+            document.getElementById('refSavings').textContent=fmt(ms);
+            document.getElementById('refBreakEven').textContent=be+' months';
+            document.getElementById('refinanceResults').classList.add('show')
+        }
+        function calculateExtra(){
+            const la=parseFloat(document.getElementById('extraLoanAmount').value)||0,ir=parseFloat(document.getElementById('extraRate').value)||0,lt=parseInt(document.getElementById('extraLoanTerm').value)||30,em=parseFloat(document.getElementById('extraMonthly').value)||0;
+            const mp=calcMP(la,ir,lt),mr=ir/100/12;
+            let b1=la,ti1=0,m1=0;
+            while(b1>0){
+                const int=b1*mr,prin=mp-int;
+                ti1+=int;
+                b1-=prin;
+                m1++;
+                if(m1>lt*12)break
+            }
+            let b2=la,ti2=0,m2=0;
+            while(b2>0){
+                const int=b2*mr,prin=mp+em-int;
+                ti2+=int;
+                b2-=prin;
+                m2++;
+                if(m2>lt*12)break
+            }
+            const y1=Math.floor(m1/12),mo1=m1%12,y2=Math.floor(m2/12),mo2=m2%12,yd=y1-y2,mod=mo1-mo2;
+            document.getElementById('extraOrigTime').textContent=y1+'y '+mo1+'m';
+            document.getElementById('extraOrigInterest').textContent=fmt(ti1);
+            document.getElementById('extraNewTime').textContent=y2+'y '+mo2+'m';
+            document.getElementById('extraNewInterest').textContent=fmt(ti2);
+            document.getElementById('extraTimeSaved').textContent=yd+'y '+Math.abs(mod)+'m';
+            document.getElementById('extraMoneySaved').textContent=fmt(ti1-ti2);
+            document.getElementById('extraResults').classList.add('show')
+        }
+        let compChart = null;
+let compLineChart = null;
+
+function calculateComparison() {
+    const la = parseFloat(document.getElementById('compLoanAmount').value) || 0;
+    const r1 = parseFloat(document.getElementById('comp1Rate').value) || 0;
+    const y1 = parseFloat(document.getElementById('comp1Years').value) || 0;
+    const r2 = parseFloat(document.getElementById('comp2Rate').value) || 0;
+    const y2 = parseFloat(document.getElementById('comp2Years').value) || 0;
+
+    // Calculate monthly payments
+    const m1 = calcMP(la, r1, y1);
+    const m2 = calcMP(la, r2, y2);
+
+    // Calculate totals
+    const totalPaid1 = m1 * y1 * 12;
+    const totalPaid2 = m2 * y2 * 12;
+    const interest1 = totalPaid1 - la;
+    const interest2 = totalPaid2 - la;
+
+    // Update display
+    document.getElementById('comp1RateDisplay').textContent = r1.toFixed(2) + '%';
+    document.getElementById('comp1TermDisplay').textContent = y1 + ' years';
+    document.getElementById('comp1Monthly').textContent = fmt(m1);
+    document.getElementById('comp1Interest').textContent = fmt(interest1);
+    document.getElementById('comp1Total').textContent = fmt(totalPaid1);
+
+    document.getElementById('comp2RateDisplay').textContent = r2.toFixed(2) + '%';
+    document.getElementById('comp2TermDisplay').textContent = y2 + ' years';
+    document.getElementById('comp2Monthly').textContent = fmt(m2);
+    document.getElementById('comp2Interest').textContent = fmt(interest2);
+    document.getElementById('comp2Total').textContent = fmt(totalPaid2);
+
+    // Calculate differences
+    const monthlyDiff = Math.abs(m1 - m2);
+    const interestDiff = Math.abs(interest1 - interest2);
+    const lowerMonthly = m1 < m2 ? 'Option 1' : 'Option 2';
+    const lowerInterest = interest1 < interest2 ? 'Option 1' : 'Option 2';
+
+    document.getElementById('compMonthlyDiff').textContent = fmt(monthlyDiff) + ' (' + lowerMonthly + ' is lower)';
+    document.getElementById('compInterestDiff').textContent = fmt(interestDiff) + ' (' + lowerInterest + ' saves more)';
+
+    document.getElementById('comparisonResults').classList.add('show');
+
+    // Bar Chart - Total Cost Comparison
+    if (compChart) compChart.destroy();
+    const ctx1 = document.getElementById('compChart').getContext('2d');
+    compChart = new Chart(ctx1, {
+        type: 'bar',
+        data: {
+            labels: ['Principal', 'Interest', 'Total Paid'],
+            datasets: [{
+                label: 'Option 1 (' + y1 + 'yr @ ' + r1 + '%)',
+                data: [la, interest1, totalPaid1],
+                backgroundColor: '#667eea'
+            }, {
+                label: 'Option 2 (' + y2 + 'yr @ ' + r2 + '%)',
+                data: [la, interest2, totalPaid2],
+                backgroundColor: '#764ba2'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value.toLocaleString();
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+    document.getElementById('compChartContainer').style.display = 'block';
+
+    // Line Chart - Loan Balance Over Time
+    const generateBalanceData = (principal, rate, years) => {
+        const monthlyRate = rate / 100 / 12;
+        const months = years * 12;
+        const payment = calcMP(principal, rate, years);
+        let balance = principal;
+        const data = [{x: 0, y: principal}];
+        
+        for (let i = 1; i <= months; i++) {
+            const interest = balance * monthlyRate;
+            const principalPayment = payment - interest;
+            balance -= principalPayment;
+            
+            // Add data point every 12 months (yearly)
+            if (i % 12 === 0) {
+                data.push({x: i / 12, y: Math.max(0, balance)});
+            }
+        }
+        return data;
+    };
+
+    const balanceData1 = generateBalanceData(la, r1, y1);
+    const balanceData2 = generateBalanceData(la, r2, y2);
+
+    if (compLineChart) compLineChart.destroy();
+    const ctx2 = document.getElementById('compLineChart').getContext('2d');
+    compLineChart = new Chart(ctx2, {
+        type: 'line',
+        data: {
+            datasets: [{
+                label: 'Option 1 (' + y1 + 'yr @ ' + r1 + '%)',
+                data: balanceData1,
+                borderColor: '#667eea',
+                backgroundColor: 'rgba(102, 126, 234, 0.1)',
+                fill: true,
+                tension: 0.4
+            }, {
+                label: 'Option 2 (' + y2 + 'yr @ ' + r2 + '%)',
+                data: balanceData2,
+                borderColor: '#764ba2',
+                backgroundColor: 'rgba(118, 75, 162, 0.1)',
+                fill: true,
+                tension: 0.4
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                x: {
+                    type: 'linear',
+                    title: {
+                        display: true,
+                        text: 'Years'
+                    }
+                },
+                y: {
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Loan Balance'
+                    },
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + (value / 1000).toFixed(0) + 'K';
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    position: 'bottom'
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': $' + context.parsed.y.toLocaleString();
+                        }
+                    }
+                }
+            }
+        }
+    });
+    document.getElementById('compLineChartContainer').style.display = 'block';
+}
+    </script>
+</body>
+</html>

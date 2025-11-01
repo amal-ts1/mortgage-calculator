@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8"   />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"   />
     <title>Mortgage Calculator</title>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
@@ -248,9 +248,8 @@
             } 
         }
     </style>
-</meta>
-</meta>
 </head>
+  
 <body>
     <div class="container">
         <header>
@@ -273,20 +272,20 @@
                         <label>Home Price</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="homePrice" value="300000" step="1000">
+                            <input type="number" id="homePrice" value="300000" step="1000"   />
                         </div>
                     </div>
                     <div class="input-group">
                         <label>Down Payment</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="downPayment" value="60000" step="1000">
+                            <input type="number" id="downPayment" value="60000" step="1000"   />
                             <span class="input-suffix">(<span id="downPercent">20</span>%)</span>
                         </div>
                     </div>
                     <div class="input-group">
                         <label>Interest Rate (%)</label>
-                        <input type="number" id="interestRate" value="6.5" step="0.125">
+                        <input type="number" id="interestRate" value="6.5" step="0.125"   />
                     </div>
                     <div class="input-group">
                         <label>Loan Term</label>
@@ -307,14 +306,14 @@
                         <label>Home Insurance (yearly)</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="homeInsurance" value="1200" step="100">
+                            <input type="number" id="homeInsurance" value="1200" step="100"   />
                         </div>
                     </div>
                     <div class="input-group">
                         <label>HOA Fees (monthly)</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="hoaFees" value="0" step="10">
+                            <input type="number" id="hoaFees" value="0" step="10"   />
                         </div>
                     </div>
                     <button class="calculate-btn" onclick="calculatePayment()">Calculate Payment</button>
@@ -359,19 +358,19 @@
                         <label>Monthly Debts</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="monthlyDebts" value="500" step="50">
+                            <input type="number" id="monthlyDebts" value="500" step="50"   />
                         </div>
                     </div>
                     <div class="input-group">
                         <label>Down Payment Saved</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="downPaymentSaved" value="60000" step="1000">
+                            <input type="number" id="downPaymentSaved" value="60000" step="1000"   />
                         </div>
                     </div>
                     <div class="input-group">
                         <label>Interest Rate (%)</label>
-                        <input type="number" id="affordInterestRate" value="6.5" step="0.125">
+                        <input type="number" id="affordInterestRate" value="6.5" step="0.125"   />
                     </div>
                     <div class="input-group">
                         <label>Loan Term</label>
@@ -408,20 +407,20 @@
                         <label>Current Loan Balance</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="currentBalance" value="240000" step="1000">
+                            <input type="number" id="currentBalance" value="240000" step="1000"   />
                         </div>
                     </div>
                     <div class="input-group">
                         <label>Current Rate (%)</label>
-                        <input type="number" id="currentRate" value="7.5" step="0.125">
+                        <input type="number" id="currentRate" value="7.5" step="0.125"   />
                     </div>
                     <div class="input-group">
                         <label>Years Remaining</label>
-                        <input type="number" id="yearsRemaining" value="27" step="1">
+                        <input type="number" id="yearsRemaining" value="27" step="1"   />
                     </div>
                     <div class="input-group">
                         <label>New Rate (%)</label>
-                        <input type="number" id="newRate" value="6.0" step="0.125">
+                        <input type="number" id="newRate" value="6.0" step="0.125"   />
                     </div>
                     <div class="input-group">
                         <label>New Term</label>
@@ -435,7 +434,7 @@
                         <label>Closing Costs</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="closingCosts" value="5000" step="100">
+                            <input type="number" id="closingCosts" value="5000" step="100"   />
                         </div>
                     </div>
                     <button class="calculate-btn" onclick="calculateRefinance()">Calculate Refinance</button>
@@ -469,7 +468,7 @@
                     </div>
                     <div class="input-group">
                         <label>Interest Rate (%)</label>
-                        <input type="number" id="extraRate" value="6.5" step="0.125">
+                        <input type="number" id="extraRate" value="6.5" step="0.125"   />
                     </div>
                     <div class="input-group">
                         <label>Loan Term</label>
@@ -483,7 +482,7 @@
                         <label>Extra Monthly Payment</label>
                         <div class="input-with-prefix">
                             <span class="input-prefix">$</span>
-                            <input type="number" id="extraMonthly" value="200" step="50">
+                            <input type="number" id="extraMonthly" value="200" step="50"   />
                         </div>
                     </div>
                     <button class="calculate-btn" onclick="calculateExtra()">Calculate Savings</button>
@@ -530,28 +529,28 @@
         <label>Loan Amount</label>
         <div class="input-with-prefix">
             <span class="input-prefix">$</span>
-            <input type="number" id="compLoanAmount" value="240000" step="1000">
+            <input type="number" id="compLoanAmount" value="240000" step="1000"   />
         </div>
     </div>
 
     <h3 style="color: #667eea; margin: 25px 0 15px 0; font-size: 1.1em;">Loan Option 1</h3>
     <div class="input-group">
         <label>Interest Rate (%)</label>
-        <input type="number" id="comp1Rate" value="6.0" step="0.125">
+        <input type="number" id="comp1Rate" value="6.0" step="0.125"   />
     </div>
     <div class="input-group">
         <label>Loan Term (years)</label>
-        <input type="number" id="comp1Years" value="15" step="1" min="1" max="40">
+        <input type="number" id="comp1Years" value="15" step="1" min="1" max="40"   />
     </div>
 
     <h3 style="color: #764ba2; margin: 25px 0 15px 0; font-size: 1.1em;">Loan Option 2</h3>
     <div class="input-group">
         <label>Interest Rate (%)</label>
-        <input type="number" id="comp2Rate" value="6.5" step="0.125">
+        <input type="number" id="comp2Rate" value="6.5" step="0.125"   />
     </div>
     <div class="input-group">
         <label>Loan Term (years)</label>
-        <input type="number" id="comp2Years" value="30" step="1" min="1" max="40">
+        <input type="number" id="comp2Years" value="30" step="1" min="1" max="40"   />
     </div>
 
     <button class="calculate-btn" onclick="calculateComparison()">Compare Options</button>
@@ -628,8 +627,8 @@
 </div>
             </div>
             <div class="sidebar">
-                <div class="ad-space vertical">Google AdSense<br>Vertical Ad<br>(300x600)</div>
-                <div class="ad-space vertical">Google AdSense<br>Vertical Ad<br>(300x250)</div>
+                <div class="ad-space vertical">Google AdSense<br   />Vertical Ad<br   />(300x600)</div>
+                <div class="ad-space vertical">Google AdSense<br   />Vertical Ad<br   />(300x250)</div>
             </div>
         </div>
         <div class="ad-space horizontal">Google AdSense - Bottom Banner (728x90 or 970x90)</div>
@@ -913,6 +912,3 @@ function calculateComparison() {
 </body>
 
 </html>
-
-
-
